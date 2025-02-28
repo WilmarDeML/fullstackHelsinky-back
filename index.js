@@ -59,6 +59,15 @@ app.get('/api/persons/:id', (req, res) => {
 app.post('/api/persons', (req, res) => {
   const newPerson = req.body;
 
+  if (!newPerson.name || !newPerson.number) {
+    const message = newPerson.name ? 'Missing number' : 'Missing name';
+    return res.status(400).json({error: message});
+  }
+
+  if (persons.find(p => p.name === newPerson.name)) {
+    return res.status(400).json({error: 'Name must be unique'});
+  }
+
   persons.push({id: getNewId(), ...newPerson});
 
   res.status(201).end();
