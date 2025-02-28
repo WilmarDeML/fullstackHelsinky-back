@@ -25,6 +25,10 @@ const persons = [
   }
 ]
 
+const getNewId = () => Math.floor(Math.random() * 100000000);
+
+app.use(express.json());
+
 app.get('/', (_req, res) => {
   res.send('<h1>Welcome to the phonebook!</h1>');
 });
@@ -50,6 +54,14 @@ app.get('/api/persons/:id', (req, res) => {
   }
 
   res.json(person);
+});
+
+app.post('/api/persons', (req, res) => {
+  const newPerson = req.body;
+
+  persons.push({id: getNewId(), ...newPerson});
+
+  res.status(201).end();
 });
 
 app.delete('/api/persons/:id', (req, res) => {
