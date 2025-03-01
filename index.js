@@ -42,6 +42,7 @@ const formatWithBody = (tokens, req, res) => {
 
 app.use(cors())
 app.use(express.json());
+app.use(express.static('dist'))
 app.use(morgan(formatWithBody));
 
 app.get('/', (_req, res) => {
