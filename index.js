@@ -29,8 +29,18 @@ const persons = [
 
 const getNewId = () => Math.floor(Math.random() * 100000000);
 
+const formatWithBody = (tokens, req, res) => {
+  const method = tokens.method(req, res);
+  const url = tokens.url(req, res);
+  const status = tokens.status(req, res);
+  const contentLength = tokens.res(req, res, 'content-length') ?? '-';
+  const responseTime = tokens['response-time'](req, res);
+  const body = method !== 'GET' ? JSON.stringify(req.body ?? '-') : '-';
+  return `${method} ${url} ${status} ${contentLength} - ${responseTime}ms ${body}`;
+};
+
 app.use(express.json());
-app.use(morgan('tiny'));
+app.use(morgan(formatWithBody));
 
 app.get('/', (_req, res) => {
   res.send('<h1>Welcome to the phonebook!</h1>');
@@ -60,7 +70,7 @@ app.get('/api/persons/:id', (req, res) => {
 });
 
 app.post('/api/persons', (req, res) => {
-  const newPerson = req.body;
+  const newPerson = {id: getNewId(), ...req.body};
 
   if (!newPerson.name || !newPerson.number) {
     const message = newPerson.name ? 'Missing number' : 'Missing name';
@@ -71,9 +81,9 @@ app.post('/api/persons', (req, res) => {
     return res.status(400).json({error: 'Name must be unique'});
   }
 
-  persons.push({id: getNewId(), ...newPerson});
+  persons.push(newPerson);
 
-  res.status(201).end();
+  res.status(201).json(newPerson);
 });
 
 app.delete('/api/persons/:id', (req, res) => {
