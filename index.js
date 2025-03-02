@@ -78,20 +78,20 @@ app.get('/api/persons/:id', (req, res) => {
 });
 
 app.post('/api/persons', (req, res) => {
-  const newPerson = {id: getNewId(), ...req.body};
+  const newPerson = new Person(req.body);
 
   if (!newPerson.name || !newPerson.number) {
     const message = newPerson.name ? 'Missing number' : 'Missing name';
     return res.status(400).json({error: message});
   }
 
-  if (persons.find(p => p.name === newPerson.name)) {
-    return res.status(400).json({error: 'Name must be unique'});
-  }
+  // if (persons.find(p => p.name === newPerson.name)) {
+  //   return res.status(400).json({error: 'Name must be unique'});
+  // }
 
-  persons.push(newPerson);
-
-  res.status(201).json(newPerson);
+  newPerson.save().then(person => {
+    res.status(201).json(person);
+  })
 });
 
 app.delete('/api/persons/:id', (req, res) => {
