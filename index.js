@@ -59,10 +59,12 @@ app.get('/info', (_req, res) => {
   `);
 });
 
-app.get('/api/persons', (_req, res) => {
-  Person.find().then(persons => {
-    res.json(persons);
-  })
+app.get('/api/persons', (_req, res, next) => {
+  Person.find()
+    .then(persons => {
+      res.json(persons);
+    })
+    .catch(error => next(error))
 });
 
 app.get('/api/persons/:id', (req, res) => {
@@ -77,7 +79,7 @@ app.get('/api/persons/:id', (req, res) => {
   res.json(person);
 });
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
   const newPerson = new Person(req.body);
 
   if (!newPerson.name || !newPerson.number) {
@@ -85,20 +87,39 @@ app.post('/api/persons', (req, res) => {
     return res.status(400).json({error: message});
   }
 
-  // if (persons.find(p => p.name === newPerson.name)) {
-  //   return res.status(400).json({error: 'Name must be unique'});
-  // }
-
-  newPerson.save().then(person => {
-    res.status(201).json(person);
-  })
+  Person.findOne({name: newPerson.name})
+    .then(foundPerson => {
+      if (foundPerson) {
+        return res.status(400).json({error: 'Name must be unique'});
+      }
+      newPerson.save()
+        .then(person => {
+          res.status(201).json(person);
+        })
+        .catch(error => next(error))
+    })
+    .catch(error => next(error))
 });
 
-app.delete('/api/persons/:id', (req, res) => {
-  Person.findByIdAndDelete(req.params.id).then(_person => {
-    res.status(204).end();
-  })
+app.delete('/api/persons/:id', (req, res, next) => {
+  Person.findByIdAndDelete(req.params.id)
+    .then(_person => {
+      res.status(204).end();
+    })
+    .catch(error => next(error))
 });
+
+const errorHandler = (error, _request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } 
+
+  next(error)
+}
+
+app.use(errorHandler)
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
