@@ -8,31 +8,6 @@ const Person = require('./models/person')
 const app = express();
 const PORT = process.env.PORT || 3001
 
-const persons = [
-  { 
-    "id": 1,
-    "name": "Arto Hellas", 
-    "number": "040-123456"
-  },
-  { 
-    "id": 2,
-    "name": "Ada Lovelace", 
-    "number": "39-44-5323523"
-  },
-  { 
-    "id": 3,
-    "name": "Dan Abramov", 
-    "number": "12-43-234345"
-  },
-  { 
-    "id": 4,
-    "name": "Mary Poppendieck", 
-    "number": "39-23-6423122"
-  }
-]
-
-const getNewId = () => Math.floor(Math.random() * 100000000);
-
 const formatWithBody = (tokens, req, res) => {
   const method = tokens.method(req, res);
   const url = tokens.url(req, res);
@@ -53,10 +28,12 @@ app.get('/', (_req, res) => {
 });
 
 app.get('/info', (_req, res) => {
-  res.send(`
-    <p>Phonebook has info for ${persons.length} people</p>
-    <p>${new Date()}</p>
-  `);
+  Person.countDocuments().then(count => {
+    res.send(`
+      <p>Phonebook has info for ${count} people</p>
+      <p>${new Date()}</p>
+    `);
+  });
 });
 
 app.get('/api/persons', (_req, res, next) => {
@@ -67,16 +44,16 @@ app.get('/api/persons', (_req, res, next) => {
     .catch(error => next(error))
 });
 
-app.get('/api/persons/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const person = persons.find(p => p.id === id);
-
-  if (!person) {
-    res.statusMessage = 'Person not found';
-    return res.status(404).end();
-  }
-
-  res.json(person);
+app.get('/api/persons/:id', (req, res, next) => {
+  Person.findById(req.params.id)
+    .then(person => {
+      if (!person) {
+        res.statusMessage = 'Person not found';
+        return res.status(404).end();
+      }
+      res.json(person);
+    })
+    .catch(error => next(error))
 });
 
 app.post('/api/persons', (req, res, next) => {
@@ -140,6 +117,11 @@ const errorHandler = (error, _request, response, next) => {
   next(error)
 }
 
+const notFoundHandler = (_request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(notFoundHandler)
 app.use(errorHandler)
 
 app.listen(PORT, () => {
