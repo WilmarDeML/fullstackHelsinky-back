@@ -101,6 +101,27 @@ app.post('/api/persons', (req, res, next) => {
     .catch(error => next(error))
 });
 
+app.put('/api/persons/:id', (req, res, next) => {
+
+  const id = req.params.id;
+  const newPerson = req.body;
+
+  if (!newPerson.name || !newPerson.number) {
+    const message = newPerson.name ? 'Missing number' : 'Missing name';
+    return res.status(400).json({error: message});
+  }
+  
+  Person.findByIdAndUpdate(id, newPerson, {new: true})
+    .then(person => {
+      if (!person) {
+        res.statusMessage = 'Person not found';
+        return res.status(404).end();
+      }
+      res.json(person);
+    })
+    .catch(error => next(error))
+});
+
 app.delete('/api/persons/:id', (req, res, next) => {
   Person.findByIdAndDelete(req.params.id)
     .then(_person => {
