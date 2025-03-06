@@ -1,4 +1,4 @@
-# fullstackHelsinky-back 2025
+# phonebook-back 2025
 
 ## Deploy in Render
 

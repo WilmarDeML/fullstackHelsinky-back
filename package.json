@@ -1,6 +1,6 @@
 {
-  "name": "fullstackhelsinky-back",
-  "version": "0.0.1",
+  "name": "phonebook-back",
+  "version": "1.0.0",
   "description": "Backend de la agenda telefónica del bootcamp full-stack con la Universidad de Helsinky",
   "main": "index.js",
   "scripts": {
@@ -8,13 +8,13 @@
     "dev": "node --watch index.js",
     "debug": "node --inspect index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:ui": "rm -rf dist && cd ../fullstackHelsinky/part3/phonebook && npm run build && cp -r dist ../../../fullstackHelsinky-back/dist",
+    "build:ui": "rm -rf dist && cd ../fullstackHelsinky/part3/phonebook && npm run build && cp -r dist ../../../phonebook-back/dist",
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push",
     "lint": "eslint ."
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/WilmarDeML/fullstackHelsinky-back.git"
+    "url": "git+https://github.com/WilmarDeML/phonebook-back.git"
   },
   "keywords": [
     "express",
@@ -24,9 +24,9 @@
   "author": "Wilmar De MelquisedecLisbet",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/WilmarDeML/fullstackHelsinky-back/issues"
+    "url": "https://github.com/WilmarDeML/phonebook-back/issues"
   },
-  "homepage": "https://github.com/WilmarDeML/fullstackHelsinky-back#readme",
+  "homepage": "https://github.com/WilmarDeML/phonebook-back#readme",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
